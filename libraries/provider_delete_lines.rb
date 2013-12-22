@@ -29,45 +29,47 @@ class Chef
       def load_current_resource
       end
 
-      def action_edit
-        regex = /#{new_resource.pattern}/
+      def stat_file(fd)
+        @file_owner = fd.lstat.uid
+        @file_group = fd.lstat.gid
+        @file_mode = fd.lstat.mode
+      end
 
-        if ::File.exists?(new_resource.path)
-          begin
-            f = ::File.open(new_resource.path, 'r+')
+      def replace_file(source, target)
+        stat_file
+        source.rewind
+        FileUtils.copy_file(sourcee.path, target.path)
+        FileUtils.chown(@file_owner, @file_group, target.path)
+        FileUtils.chmod(@file_mode, targer.path)
+        source.close
+      end
 
-            file_owner = f.lstat.uid
-            file_group = f.lstat.gid
-            file_mode = f.lstat.mode
-
-            temp_file = Tempfile.new('foo')
-
-            modified = false
-
-            f.lines.each do |line|
-              if line =~ regex
-                modified = true
-              else
-                temp_file.puts line
-              end
-            end
-
-            f.close
-
-            if modified
-              temp_file.rewind
-              FileUtils.copy_file(temp_file.path, new_resource.path)
-              FileUtils.chown(file_owner, file_group, new_resource.path)
-              FileUtils.chmod(file_mode, new_resource.path)
-              new_resource.updated_by_last_action(true)
-            end
-
-          ensure
-            temp_file.close
-            temp_file.unlink
+      def grep_dash_v(path, tempfile, regex)
+        f = ::File.open(path, 'r+')
+        @modified = false
+        f.lines.each do |line|
+          if line =~ regex
+            @modified = true
+          else
+            tempfile.puts line
           end
-        end # ::File.exists
-      end # def action_edit
+        end
+        f.close
+      end
+
+      def action_edit
+        if ::File.exists?(new_resource.path)
+          temp_file = Tempfile.new('foo')
+          grep_dash_v new_resource.path, temp_file, /#{new_resource.pattern}/
+
+          if @modified
+            replace_file temp_file, new_resource
+            new_resource.updated_by_last_action(true)
+          end
+
+          temp_file.unlink
+        end
+      end
 
       def action_nothing
       end

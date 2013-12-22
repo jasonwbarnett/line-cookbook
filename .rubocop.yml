@@ -5,7 +5,13 @@ Encoding:
   Enabled: false
 
 LineLength:
-  Max: 200
+  Max: 100
+
+MethodLength:
+  Max: 20
 
 HashSyntax:
   EnforcedStyle: hash_rockets
+
+RedundantBegin:
+  Enabled: false

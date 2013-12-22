@@ -25,31 +25,38 @@ class Chef
       def load_current_resource
       end
 
+      def whyrun_supported?
+        true
+      end
+
+      def append_existing_file(regex)
+        f = ::File.open(new_resource.path, 'r+')
+        found = false
+        f.lines.each { |line| found = true if line =~ regex }
+
+        unless found
+          f.puts new_resource.line
+          new_resource.updated_by_last_action(true)
+        end
+
+        f.close
+      end
+
+      def append_new_file(regex)
+        f = ::File.open(new_resource.path, 'w')
+        f.puts new_resource.line
+
+        f.close
+      end
+
       def action_edit
-        string = escape_string new_resource.line
-        regex = /^#{string}$/
+        regex = /^#{escape_string new_resource.line}$/
 
-        if ::File.exists?(new_resource.path)
-          begin
-            f = ::File.open(new_resource.path, 'r+')
-
-            found = false
-            f.lines.each { |line| found = true if line =~ regex }
-
-            unless found
-              f.puts new_resource.line
-              new_resource.updated_by_last_action(true)
-            end
-          ensure
-            f.close
-          end
-        else
-
-          begin
-            f = ::File.open(new_resource.path, 'w')
-            f.puts new_resource.line
-          ensure
-            f.close
+        converge_by("Appending #{new_resource}") do
+          if ::File.exists?(new_resource.path)
+            append_exiting_file regex
+          else
+            append_new_file regex
           end
         end
 
