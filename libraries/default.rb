@@ -2,7 +2,7 @@
 # Cookbook Name:: line
 # Library:: default
 #
-# Author:: Sean OMeara <someara@opscode.com>                                  
+# Author:: Sean OMeara <someara@opscode.com>
 # Copyright 2012-2013, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,9 +16,9 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#    
+#
 
 def escape_string(string)
   pattern = /(\+|\'|\"|\.|\*|\/|\-|\\|\(|\)|\{|\})/
-  string.gsub(pattern){|match|"\\" + match}
+  string.gsub(pattern) { |match|'\\' + match }
 end

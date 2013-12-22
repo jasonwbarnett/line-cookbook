@@ -2,7 +2,7 @@
 # Cookbook Name:: line
 # Library:: resource_append_if_no_such_line
 #
-# Author:: Sean OMeara <someara@opscode.com>                                  
+# Author:: Sean OMeara <someara@opscode.com>
 # Copyright 2012-2013, Opscode, Inc.
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,20 +16,20 @@
 # WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 # See the License for the specific language governing permissions and
 # limitations under the License.
-#    
+#
 
 class Chef
   class Resource
+    #
     class AppendIfNoLine < Chef::Resource
-
-      def initialize(name, run_context=nil)
+      def initialize(name, run_context = nil)
         super
         @resource_name = :append_if_no_line
         @action = :edit
-        @allowed_actions.push(:edit,:nothing)
+        @allowed_actions.push(:edit, :nothing)
       end
 
-      def path(arg=nil)
+      def path(arg = nil)
         set_or_return(
           :path,
           arg,
@@ -37,14 +37,13 @@ class Chef
           )
       end
 
-      def line(arg=nil)
+      def line(arg = nil)
         set_or_return(
           :line,
           arg,
           :kind_of => String
           )
       end
-
     end
   end
 end
