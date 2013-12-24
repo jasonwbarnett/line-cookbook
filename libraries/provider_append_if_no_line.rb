@@ -33,19 +33,16 @@ class Chef
         f = ::File.open(new_resource.path, 'r+')
         found = false
         f.lines.each { |line| found = true if line =~ regex }
-
         unless found
           f.puts new_resource.line
           new_resource.updated_by_last_action(true)
         end
-
         f.close
       end
 
       def append_new_file(regex)
         f = ::File.open(new_resource.path, 'w')
         f.puts new_resource.line
-
         f.close
       end
 
@@ -54,7 +51,7 @@ class Chef
 
         converge_by("Appending #{new_resource}") do
           if ::File.exists?(new_resource.path)
-            append_exiting_file regex
+            append_existing_file regex
           else
             append_new_file regex
           end
